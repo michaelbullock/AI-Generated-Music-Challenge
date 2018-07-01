@@ -152,7 +152,7 @@ class MidiPreprocessor:
                 break
         return sets_are_same
 
-    def time_series_to_msgs(self, time_series_data):
+    def time_series_to_simple_note_list(self, time_series_data):
         """Converts time series data to simple messages (necessary for producing midis). """
 
         simple_note_list = []
@@ -230,9 +230,12 @@ class MidiPreprocessor:
         piano_tracks = []
 
         # pick out only "Piano right" and "Piano left"
-        for track in mid.tracks:
-            if (track.name == "Piano left") or (track.name == "Piano right"):
-                piano_tracks.append(track)
+        # for track in mid.tracks:
+        #    if (track.name == "Piano left") or (track.name == "Piano right"):
+        #         piano_tracks.append(track)
+
+        piano_tracks = [mid.tracks[0]]
+
 
         # returned list containing all real notes parsed from the first track of the given file
         real_note_list = []
