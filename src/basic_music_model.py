@@ -19,7 +19,6 @@ class Model(object):
         self.df_file = df_file
         self.current_save_name = ""
 
-
     def print_model_info(self):
         print("\n")
         print("Model info:")
@@ -34,13 +33,11 @@ class Model(object):
         print("current_save_name: %s" % self.current_save_name)
         print("\n")
 
-
     def build_graph(self):
         print("Building model")
 
-        X_placeholder = tf.placeholder(tf.float32, [None, self.num_timesteps, self.num_keys])
+        x_placeholder = tf.placeholder(tf.float32, [None, self.num_timesteps, self.num_keys])
         y_placeholder = tf.placeholder(tf.float32, [None, self.num_timesteps, self.num_keys])
-
 
         def single_cell():
             return tf.contrib.rnn.BasicLSTMCell(num_units=self.num_neurons_inlayer, activation=tf.nn.tanh)
@@ -52,37 +49,24 @@ class Model(object):
             stacked_lstm,
             output_size=self.num_keys)
 
-        outputs, states = tf.nn.dynamic_rnn(lstm_with_wrapper, X_placeholder, dtype=tf.float32)
+        outputs, states = tf.nn.dynamic_rnn(lstm_with_wrapper, x_placeholder, dtype=tf.float32)
 
-        # TO DO: funky stuff, clean up later
-        learning_rate = tf.placeholder(tf.float32, shape=[])
-        learning_rate = tf.cast(self.learning_rate, tf.float32)
-
-        # loss = tf.reduce_mean(tf.nn.cross_entropy_with_logits(logits=outputs, labels=y_placeholder))
         loss = tf.reduce_mean(tf.square(outputs - y_placeholder))
 
-        optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
+        optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
         train = optimizer.minimize(loss)
-
-        # sentence_loss_pl = tf.placeholder(tf.float32, [])
 
         init = tf.global_variables_initializer()
 
-        return init, train, loss, X_placeholder, y_placeholder, outputs
+        return init, train, loss, x_placeholder, y_placeholder, outputs
 
-    def train_model(self, df,  num_samples_to_train, save_every=10000, graph_name=""):
+    def train_model(self, df, num_samples_to_train, save_every=10000, graph_name=""):
         print("Training started at: " + datetime.datetime.now().strftime("%H:%M:%S"))
-        init, train, loss, X_placeholder, y_placeholder, outputs = self.build_graph()
+        init, train, loss, x_placeholder, y_placeholder, outputs = self.build_graph()
 
         saver = tf.train.Saver(max_to_keep=100)
         loss_summary = tf.summary.scalar('Loss', loss)
 
-        # sentence_loss_list = np.array([])
-
-        # sentence_loss_summary = tf.summary.scalar('Sentence Loss', sentence_loss_pl)
-
-
-        ### TRAINING MODEL
         with tf.Session() as sess:
             sess.run(init)
 
@@ -90,8 +74,7 @@ class Model(object):
                 print("Loading graph: %s" % ("../models/" + graph_name))
                 saver.restore(sess, "../models/" + graph_name)
 
-            #TensorBoard code
-            #summaryMerged = tf.summary.merge_all()
+            # TensorBoard code
             self.update_save_name()
             filename = "../logs/" + self.current_save_name
             writer = tf.summary.FileWriter(filename, sess.graph)
@@ -99,23 +82,31 @@ class Model(object):
             learning_rate = tf.placeholder(tf.float32, shape=[])
 
             curr_sample_counter = 0
+            while curr_sample_counter < num_samples_to_train:
 
-            for curr_sample in range(num_samples_to_train):
-
-
+                # sample batch from df
                 df_sample = df.sample(n=self.batch_size)
 
+                # manipulate data sampled to be a np.array of shape (batch_size, num_timesteps, num_keys)
+                x_batch = np.array([])
+                y_batch = np.array([])
+                for batch_index in range(len(df_sample.values[:, 0])):
+                    x_batch = np.append(x_batch, np.array(df_sample.values[batch_index, 0]))
+                    y_batch = np.append(y_batch, np.array(df_sample.values[batch_index, 1]))
 
-                x_batch = np.array(df_sample.values[0, 0]).reshape((self.batch_size, self.num_timesteps, self.num_keys))
-                y_batch = np.array(df_sample.values[0, 1]).reshape((self.batch_size, self.num_timesteps, self.num_keys))
+                x_batch = x_batch.reshape((self.batch_size, self.num_timesteps, self.num_keys))
+                y_batch = y_batch.reshape((self.batch_size, self.num_timesteps, self.num_keys))
 
+                # train network
                 loss_result, train_result, sample_loss = sess.run([loss_summary, train, loss],
-                                                            feed_dict={X_placeholder: x_batch, y_placeholder: y_batch,
+                                                            feed_dict={x_placeholder: x_batch, y_placeholder: y_batch,
                                                                        learning_rate: self.learning_rate})
 
+                # record loss for TensorBoard
                 writer.add_summary(loss_result, curr_sample_counter)
-                curr_sample_counter += 1
+                curr_sample_counter += self.batch_size
 
+                # save model every "save_every" samples
                 if curr_sample_counter % save_every == 0:
                     # saving due to the "save_every" condition
                     variables_save_file = "../models/" + self.df_file + "_" + datetime.datetime.now().strftime(
@@ -125,7 +116,7 @@ class Model(object):
                     print("Saved graph to: %s" % variables_save_file)
                     self.save()
 
-            # save once done training
+            # save model once done training
             print("FINISHED TRAINING, NOW SAVING")
             variables_save_file = "../models/" + self.df_file + "_" + datetime.datetime.now().strftime("%m-%d--%H-%M")
             print("\nTrained %d sentences\tTime: %s" % (curr_sample_counter, datetime.datetime.now().strftime("%H:%M:%S")))
@@ -134,7 +125,6 @@ class Model(object):
             writer.close()
             self.save()
         return
-
 
     def save(self):
         self.update_save_name()
