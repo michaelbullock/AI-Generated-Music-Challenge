@@ -13,6 +13,7 @@ from os.path import isfile, join
 import sys
 import datetime
 
+
 class RealNoteMessage:
     """ stores note-on data pulled from mido messages
     values are unscaled (range of velocity [0,127], but [-1,1] when scaled)
@@ -39,7 +40,7 @@ class RealNoteMessage:
             simple_velocity = self._velocity
 
         # divide time by 10, rounding all numbers up, like math.ceil()
-        simple_time = int(self._time/60 +0.9)
+        simple_time = int(self._time/60 + 0.9)
 
         simple_note = SimpleNoteMessage(self._note, simple_velocity, simple_time)
         return simple_note
@@ -90,7 +91,7 @@ class SimpleNoteMessage:
             real_velocity = self._velocity
 
         # multiply by 60
-        real_time = self._time * 60
+        real_time = (self._time * 60)  # - 240
 
         # channel is assumed to be 0
         real_note = RealNoteMessage(self._note, real_velocity, real_time, 0)
@@ -103,11 +104,48 @@ class MidiPreprocessor:
         pass
 
     def simple_notes_to_time_series(self, simple_note_list):
-        """Converts a list of simple notes to time series data that can be fed into the RNN. """
+        
         time_series_data = np.array([])
         time_step_notes = np.zeros(128)-1
 
-        time_delta = 0
+        curr_msg_index = 0
+        zero_note_list = []
+        # iterate through all messages
+        while curr_msg_index < len(simple_note_list):
+
+            # get time to wait before executing note event
+            time_delta = simple_note_list[curr_msg_index]._time
+
+            if time_delta == 0:
+                # edit the temporary time_step_notes variable before saving it for the next time_delta
+                curr_note = simple_note_list[curr_msg_index]._note
+                time_step_notes[curr_note] = simple_note_list[curr_msg_index]._velocity
+
+                for note in zero_note_list:
+                    if curr_note == note:
+                        # go back and find that note in previous timestep and turn it off
+                        # fixes some issues with rhythm errors
+                        time_series_data[len(time_series_data)-1][curr_note] = -1
+                zero_note_list.append(curr_note)
+            else:
+                # when the time delta is not zero, write in time_step_notes for each new time step
+                while time_delta > 0:
+                    time_series_data = np.append(time_series_data, time_step_notes).reshape(-1, 128)
+                    time_step_notes = np.copy(time_step_notes)
+                    time_delta -= 1
+                time_step_notes[simple_note_list[curr_msg_index]._note] = simple_note_list[curr_msg_index]._velocity
+                zero_note_list = [simple_note_list[curr_msg_index]._note]
+            curr_msg_index += 1
+
+
+        return time_series_data
+
+    """
+    # old simple notes to time series
+    def simple_notes_to_time_series(self, simple_note_list):
+        
+        time_series_data = np.array([])
+        time_step_notes = np.zeros(128)-1
 
         curr_msg_index = 0
         time_delta = 0
@@ -140,7 +178,7 @@ class MidiPreprocessor:
             time_step_notes = np.copy(time_step_notes)
 
         return time_series_data
-
+    """
     def time_steps_are_same(self, time1, time2):
         """ Checks if all notes in the same time step are the same """
         sets_are_same = True
@@ -152,6 +190,35 @@ class MidiPreprocessor:
 
     def time_series_to_simple_note_list(self, time_series_data):
         """Converts time series data to simple messages (necessary for producing midis). """
+        # create blank time_step_notes to use for comparison at first
+        temp_step_notes = np.zeros(128) - 1
+        simple_note_list = []
+
+        time_delta = 0
+        # iterate through each time index
+        for time_index in range((len(time_series_data)-1)):
+            curr_notes = time_series_data[time_index]
+            # check if time step are the same so we can increase the time delta
+            if self.time_steps_are_same(temp_step_notes, curr_notes):
+                time_delta += 1
+            # otherwise, log the changes as simple note messages
+            else:
+                for note_index in range(len(curr_notes)):
+                    # if a note has changed
+                    if temp_step_notes[note_index] != curr_notes[note_index]:
+                        temp_step_notes[note_index] = curr_notes[note_index]
+                        # create message with time_delta=0 and append to list
+                        # SimpleNoteMessage(note, velocity, time)
+                        simple_note_msg = SimpleNoteMessage(note_index, curr_notes[note_index], time_delta)
+                        simple_note_list.append(simple_note_msg)
+                        time_delta = 0
+                time_delta = 1
+        return simple_note_list
+
+    """
+    # old time series to simple note list 
+   def time_series_to_simple_note_list(self, time_series_data):
+        # Converts time series data to simple messages (necessary for producing midis). 
 
         simple_note_list = []
 
@@ -178,7 +245,7 @@ class MidiPreprocessor:
 
             # using set and hash function broken (maybe fix later)
             # while set(time_series_data[time_index]) == set(time_series_data[time_index-1]):
-            while self.time_steps_are_same(time_series_data[time_index], time_series_data[time_index-1]):
+            while self.time_steps_are_same(time_series_data[time_index], time_series_data[time_index-1]) and time_index < (len(time_series_data)-1):
                 time_delta += 1
                 time_index += 1
 
@@ -197,7 +264,7 @@ class MidiPreprocessor:
             time_delta = 0
 
         return simple_note_list
-
+    """
     def msgs_to_midi(self, real_note_list, filename):
         """Takes a list of real messages and creates a midi track"""
         mid = MidiFile()
@@ -227,41 +294,35 @@ class MidiPreprocessor:
         mid = MidiFile(filename)
         piano_tracks = []
 
-        # pick out only "Piano right" and "Piano left"
-        # for track in mid.tracks:
-        #    if (track.name == "Piano left") or (track.name == "Piano right"):
-        #         piano_tracks.append(track)
-
-        piano_tracks = [mid.tracks[0]]
-
-
+        # pick out only track with largest number of messages
+        for track in mid.tracks:
+            if(len(track) > len(piano_tracks)):
+                piano_tracks = track
         # returned list containing all real notes parsed from the first track of the given file
         real_note_list = []
         curr_num_messages = 0
         wait_time = 0
 
         # iterate through all piano tracks
-        for track in piano_tracks:
-            # handle all msgs in the track
-            for msg in track:
-                # just in case track is brokenly long
-                if curr_num_messages > max_messages:
+        for msg in piano_tracks:
+            # just in case track is brokenly long
+            if curr_num_messages > max_messages:
                     print("ERROR: REACHED MAX MESSAGES: {}".format(max_messages))
                     break
-                else:
-                    curr_num_messages += 1
+            else:
+                curr_num_messages += 1
 
                 # if note on message, record
-                if msg.type == "note_on":
-                    # all_note_on_msgs.append(msg)
-                    real_note_message = RealNoteMessage(msg.note, msg.velocity, msg.time + wait_time, msg.channel)
-                    wait_time = 0
-                    real_note_list.append(real_note_message)
+            if msg.type == "note_on":
+                # all_note_on_msgs.append(msg)
+                real_note_message = RealNoteMessage(msg.note, msg.velocity, msg.time + wait_time, msg.channel)
+                wait_time = 0
+                real_note_list.append(real_note_message)
 
-                # if not note message, still check if it has a wait time, record if it does
-                elif hasattr(msg, 'time'):
-                    if (msg.time > 0) and (len(real_note_list)>0):
-                        wait_time += int(msg.time)
+            # if not note message, still check if it has a wait time, record if it does
+            elif hasattr(msg, 'time'):
+                if (msg.time > 0) and (len(real_note_list)>0):
+                    wait_time += int(msg.time)
 
         return real_note_list
 
