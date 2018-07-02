@@ -1,7 +1,5 @@
 """
-    File: midi_utils.py
-    Author(s): Noah Thurston
-    Purpose: Classes for loading and parsing midi data.
+Classes for loading and parsing midi data.
 """
 
 import numpy as np

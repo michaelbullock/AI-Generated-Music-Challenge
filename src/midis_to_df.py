@@ -1,8 +1,5 @@
 """
-    File: midis_to_df.py
-    Author(s): Noah Thurston
-    Purpose: Loads all midis files in a directory, parses them by time step
-    and saves them to pandas datafram
+Loads all midi files in a directory, parses them by time step and saves them to pandas data frame.
 """
 
 from midi_utils import *

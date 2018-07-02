@@ -1,3 +1,7 @@
+"""
+Training the basic music model
+"""
+
 from basic_music_model import *
 import pandas as pd
 

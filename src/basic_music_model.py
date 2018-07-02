@@ -1,4 +1,7 @@
-# rnn that can generate sentences
+"""
+The most basic music generation model.
+N time steps are fed into the model and it predicts N time steps, shifted forward 1 time step.
+"""
 
 import numpy as np
 import tensorflow as tf
