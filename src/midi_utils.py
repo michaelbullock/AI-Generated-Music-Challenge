@@ -105,8 +105,9 @@ class MidiPreprocessor:
 
     def simple_notes_to_time_series(self, simple_note_list):
         
-        time_series_data = np.array([])
-        time_step_notes = np.zeros(128)-1
+        time_series_data = np.array([]).astype(np.float32)
+        time_step_notes = np.zeros(128)-1.
+        time_step_notes = time_step_notes.astype(np.float32)
 
         curr_msg_index = 0
         zero_note_list = []
@@ -136,7 +137,6 @@ class MidiPreprocessor:
                 time_step_notes[simple_note_list[curr_msg_index]._note] = simple_note_list[curr_msg_index]._velocity
                 zero_note_list = [simple_note_list[curr_msg_index]._note]
             curr_msg_index += 1
-
 
         return time_series_data
 
@@ -192,6 +192,7 @@ class MidiPreprocessor:
         """Converts time series data to simple messages (necessary for producing midis). """
         # create blank time_step_notes to use for comparison at first
         temp_step_notes = np.zeros(128) - 1
+        temp_step_notes.astype(np.float32)
         simple_note_list = []
 
         time_delta = 0
@@ -329,7 +330,7 @@ class MidiPreprocessor:
     def midi_to_df(self, df, labels, time_series_data, num_timesteps):
         """Takes time series data of an individual song and adds network input/output data to a df. """
         # not correctly casting to np.int8
-        time_series_data = time_series_data.astype(np.int8, copy=False)
+        # time_series_data = time_series_data.astype(np.int8, copy=False)
         for index in range(len(time_series_data) - num_timesteps):
             x = time_series_data[index:index + num_timesteps]
             y = time_series_data[index + 1:index + num_timesteps + 1]

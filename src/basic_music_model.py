@@ -11,6 +11,8 @@ import pickle
 
 import datetime
 
+
+
 class Model(object):
     def __init__(self, df_file, num_keys, num_timesteps, num_layers, num_neurons_inlayer, learning_rate, batch_size):
         self.num_timesteps = num_timesteps
@@ -148,3 +150,41 @@ class Model(object):
     def update_save_name(self):
         self.current_save_name = self.df_file + "_" + datetime.datetime.now().strftime("%m-%d--%H-%M")
 
+    def generate_music(self, graph_name, starting_time_step_notes, time_series_length):
+        """Returns generated time series data"""
+        print("generating time series data")
+
+        init, train, loss, x_placeholder, y_placeholder, outputs = self.build_graph()
+
+        saver = tf.train.Saver()
+
+        generated_time_series_data = np.array([])
+
+        generated_time_series_data = np.append(generated_time_series_data, starting_time_step_notes).reshape(-1, 128)
+
+
+        with tf.Session() as sess:
+            sess.run(init)
+
+            saver.restore(sess, "../models/" + graph_name)
+            new = generated_time_series_data[0:0 + self.num_timesteps, :].reshape(1, self.num_timesteps, 128)
+            # feed starting notes through model
+            # for x in range(len(generated_time_series_data - self.num_timesteps)):
+            sess.run(tf.nn.softmax(logits=outputs), feed_dict={x_placeholder: generated_time_series_data[0:self.num_timesteps, :].reshape(1, self.num_timesteps, 128)})
+
+            while len(generated_time_series_data) < time_series_length:
+                print(len(generated_time_series_data))
+                curr_time_series = generated_time_series_data[-self.num_timesteps:, :].reshape(1, -1, 128)
+                pred_time_series = sess.run(tf.nn.softmax(logits=outputs), feed_dict={x_placeholder: curr_time_series})
+
+                # ensure the new notes are simple (1 or -1)
+                for time in range(len(pred_time_series[0])-1):
+                    for note in range(0, 127, 1):
+                        if pred_time_series[0][time][note] < 0.009:
+                            pred_time_series[0][time][note] = -1
+                        else:
+                            pred_time_series[0][time][note] = 1
+
+                generated_time_series_data = np.append(generated_time_series_data, pred_time_series[0]).reshape(-1, 128)
+                print()
+        return generated_time_series_data
