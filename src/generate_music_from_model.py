@@ -2,9 +2,10 @@ from basic_music_model import *
 import pandas as pd
 import tensorflow as tf
 from midi_utils import *
+import datetime
 
-MODEL_NAME = "four_schuberts_16ts_07-03--18-11"
-GRAPH_NAME = "four_schuberts_16ts_07-03--18-11"
+MODEL_NAME = "four_schuberts_16ts_07-04--14-27"
+GRAPH_NAME = "four_schuberts_16ts_07-04--14-27"
 
 
 # create starting time step
@@ -17,11 +18,11 @@ note = SimpleNoteMessage(70, 1, 0)
 simple_notes.append(note)
 note = SimpleNoteMessage(73, 1, 0)
 simple_notes.append(note)
-note = SimpleNoteMessage(66, -1, 16)
+note = SimpleNoteMessage(66, -1, 8)
 simple_notes.append(note)
 note = SimpleNoteMessage(70, -1, 0)
 simple_notes.append(note)
-note = SimpleNoteMessage(73, -1, 0)
+note = SimpleNoteMessage(73, -1, 8)
 simple_notes.append(note)
 
 prep = MidiPreprocessor()
@@ -57,5 +58,5 @@ new_real_notes = []
 for note in new_simple_notes:
     new_real_notes.append(note.to_real_note())
 
-prep.msgs_to_midi(new_real_notes, "../midis/generated.mid")
+prep.msgs_to_midi(new_real_notes, "../midis/generated_" + datetime.datetime.now().strftime("%m-%d--%H-%M") + ".mid")
 

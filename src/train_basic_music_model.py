@@ -14,8 +14,8 @@ learning_rate = 0.001
 batch_size = 5
 
 # training parameters
-num_samples_to_train = 2000
-save_every = 500
+num_samples_to_train = 200*1000
+save_every = 20000
 
 # load data frame
 df_file = "four_schuberts_16ts"

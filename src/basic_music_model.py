@@ -117,14 +117,14 @@ class Model(object):
                     variables_save_file = "../models/" + self.df_file + "_" + datetime.datetime.now().strftime(
                         "%m-%d--%H-%M")
                     saver.save(sess, variables_save_file)
-                    print("\nTrained %d sentences\tTime: %s" % (curr_sample_counter, datetime.datetime.now().strftime("%H:%M:%S")))
+                    print("\nTrained %d time steps\tTime: %s" % (curr_sample_counter, datetime.datetime.now().strftime("%H:%M:%S")))
                     print("Saved graph to: %s" % variables_save_file)
                     self.save()
 
             # save model once done training
             print("FINISHED TRAINING, NOW SAVING")
             variables_save_file = "../models/" + self.df_file + "_" + datetime.datetime.now().strftime("%m-%d--%H-%M")
-            print("\nTrained %d sentences\tTime: %s" % (curr_sample_counter, datetime.datetime.now().strftime("%H:%M:%S")))
+            print("\nTrained %d time steps\tTime: %s" % (curr_sample_counter, datetime.datetime.now().strftime("%H:%M:%S")))
             print("Saved graph to: %s" % variables_save_file)
             saver.save(sess, variables_save_file)
             writer.close()
