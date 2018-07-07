@@ -4,14 +4,14 @@ Loads all midi files in a directory, parses them by time step and saves them to 
 
 from midi_utils import *
 
-LOAD_DIR = "../midis/"
+LOAD_DIR = "../small_midis_format0_ab/"
 SAVE_DIR = "../data/"
-NUM_TIMESTEPS = 16
+NUM_TIMESTEPS = 32
 
 preprocessor = MidiPreprocessor()
 df = preprocessor.all_midis_to_df(LOAD_DIR, NUM_TIMESTEPS)
 
-save_filename = "{}four_schuberts_{}ts.pkl".format(SAVE_DIR, NUM_TIMESTEPS)
+save_filename = "{}small_midis_format0_ab_{}ts.pkl".format(SAVE_DIR, NUM_TIMESTEPS)
 
 print("Saving data frame to: {}".format(save_filename))
 

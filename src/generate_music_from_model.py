@@ -3,16 +3,24 @@ import pandas as pd
 import tensorflow as tf
 from midi_utils import *
 import datetime
+import pickle
 
-MODEL_NAME = "four_schuberts_16ts_07-04--14-27"
-GRAPH_NAME = "four_schuberts_16ts_07-04--14-27"
-
-
-# create starting time step
-
+# create starting time steps
 simple_notes = []
 
+# simple 3 notes starting notes
+"""
 note = SimpleNoteMessage(66, 1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(70, 1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(73, 1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(66, -1, 8)
+simple_notes.append(note)
+note = SimpleNoteMessage(70, -1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(66, 1, 8)
 simple_notes.append(note)
 note = SimpleNoteMessage(70, 1, 0)
 simple_notes.append(note)
@@ -24,32 +32,41 @@ note = SimpleNoteMessage(70, -1, 0)
 simple_notes.append(note)
 note = SimpleNoteMessage(73, -1, 8)
 simple_notes.append(note)
+"""
 
+# ascending notes starting notes
+note = SimpleNoteMessage(66, 1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(66, -1, 8)
+simple_notes.append(note)
+note = SimpleNoteMessage(67, 1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(67, -1, 8)
+simple_notes.append(note)
+note = SimpleNoteMessage(68, 1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(68, -1, 8)
+simple_notes.append(note)
+note = SimpleNoteMessage(69, 1, 0)
+simple_notes.append(note)
+note = SimpleNoteMessage(69, -1, 8)
+simple_notes.append(note)
+
+
+# create preprocessor and starting time step data
 prep = MidiPreprocessor()
 time_series_data = prep.simple_notes_to_time_series(simple_notes)
 
-# model parameters
-num_keys = 128
-num_timesteps = 16
-num_layers = 2
-num_neurons_inlayer = 100
-learning_rate = 0.001
-batch_size = 5
+# load model.pkl and tf graph
+MODEL_NAME = "small_midis_format0_ab_32ts_07-07--08-23"
+GRAPH_NAME = "small_midis_format0_ab_32ts_07-07--08-23"
+NUM_TIMESTEPS_TO_GENERATE = 200
 
-# training parameters
-num_samples_to_train = 2000
-save_every = 500
-
-# load data frame
-df_file = "four_schuberts_16ts"
-df = pd.read_pickle("../data/" + df_file + ".pkl")
-
-tmp = Model(df_file, num_keys, num_timesteps, num_layers, num_neurons_inlayer, learning_rate, batch_size)
-
+tmp = Model(" ", 128, 32, 2, 100, 0.001, 5)
 model = tmp.load(MODEL_NAME)
 
 tf.reset_default_graph()
-generated_time_series = model.generate_music(GRAPH_NAME, time_series_data, 500)
+generated_time_series = model.generate_music(GRAPH_NAME, time_series_data, NUM_TIMESTEPS_TO_GENERATE)
 
 new_simple_notes = prep.time_series_to_simple_note_list(generated_time_series)
 

@@ -177,14 +177,13 @@ class Model(object):
                 curr_time_series = generated_time_series_data[-self.num_timesteps:, :].reshape(1, -1, 128)
                 pred_time_series = sess.run(tf.nn.softmax(logits=outputs), feed_dict={x_placeholder: curr_time_series})
 
-                # ensure the new notes are simple (1 or -1)
-                for time in range(len(pred_time_series[0])-1):
-                    for note in range(0, 127, 1):
-                        if pred_time_series[0][time][note] < 0.009:
-                            pred_time_series[0][time][note] = -1
-                        else:
-                            pred_time_series[0][time][note] = 1
+                # iterate through the last time step of the new notes and round to (1 or -1)
+                for note in range(0, 128, 1):
+                    if pred_time_series[0][-1][note] < 0.007:
+                        pred_time_series[0][-1][note] = -1
+                    else:
+                        pred_time_series[0][-1][note] = 1
 
-                generated_time_series_data = np.append(generated_time_series_data, pred_time_series[0]).reshape(-1, 128)
+                generated_time_series_data = np.append(generated_time_series_data, pred_time_series[0, -1, :]).reshape(-1, 128)
                 print()
         return generated_time_series_data
