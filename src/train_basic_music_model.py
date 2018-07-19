@@ -9,7 +9,7 @@ import pandas as pd
 num_keys = 128
 num_timesteps = 32
 num_layers = 2
-num_neurons_inlayer = 100
+num_neurons_inlayer = 25
 learning_rate = 0.0001
 batch_size = 5
 

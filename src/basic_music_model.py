@@ -12,6 +12,8 @@ import pickle
 import datetime
 
 
+def steep_tanh(x):
+    return tf.nn.tanh(10*x)
 
 class Model(object):
     def __init__(self, df_file, num_keys, num_timesteps, num_layers, num_neurons_inlayer, learning_rate, batch_size):
@@ -38,11 +40,13 @@ class Model(object):
         print("current_save_name: %s" % self.current_save_name)
         print("\n")
 
+
+
     def build_graph(self):
         print("Building model")
 
         x_placeholder = tf.placeholder(tf.float32, [None, self.num_timesteps, self.num_keys])
-        y_placeholder = tf.placeholder(tf.float32, [None, self.num_timesteps, self.num_keys])
+        y_placeholder = tf.placeholder(tf.float32, [None, 1, self.num_keys])
 
         def single_cell():
             return tf.contrib.rnn.BasicLSTMCell(num_units=self.num_neurons_inlayer, activation=tf.nn.tanh)
@@ -50,20 +54,28 @@ class Model(object):
         stacked_lstm = tf.contrib.rnn.MultiRNNCell(
             [single_cell() for _ in range(self.num_layers)])
 
-        lstm_with_wrapper = tf.contrib.rnn.OutputProjectionWrapper(
-            stacked_lstm,
-            output_size=self.num_keys)
+        # forget about the output wrapper
+        # lstm_with_wrapper = tf.contrib.rnn.OutputProjectionWrapper(stacked_lstm, output_size=self.num_keys)
 
-        outputs, states = tf.nn.dynamic_rnn(lstm_with_wrapper, x_placeholder, dtype=tf.float32)
 
-        loss = tf.reduce_mean(tf.square(outputs - y_placeholder))
+        lstm_outputs, states = tf.nn.dynamic_rnn(stacked_lstm, x_placeholder, dtype=tf.float32)
+
+        # the output of stacked_lstm is [?, num_timesteps, num_neurons_inlayer], use tf.gather to get only the last time step
+        # goal output is [?, 1, num_neurons_inlayer]
+        lstm_output_T = tf.transpose(lstm_outputs, [1, 0, 2])
+        lstm_last_output = tf.gather(lstm_output_T, int(lstm_output_T.get_shape()[0]) - 1)
+
+        # create a dense layer that connects the last time step output of 100 nodes to 128 keys
+        dense_output = tf.layers.dense(inputs=lstm_last_output, units=128, activation=steep_tanh)
+
+        loss = tf.reduce_mean(tf.square(dense_output - y_placeholder))
 
         optimizer = tf.train.AdamOptimizer(learning_rate=self.learning_rate)
         train = optimizer.minimize(loss)
 
         init = tf.global_variables_initializer()
 
-        return init, train, loss, x_placeholder, y_placeholder, outputs
+        return init, train, loss, x_placeholder, y_placeholder, dense_output
 
     def train_model(self, df, num_samples_to_train, save_every=10000, graph_name=""):
         print("Training started at: " + datetime.datetime.now().strftime("%H:%M:%S"))
@@ -100,12 +112,19 @@ class Model(object):
                     y_batch = np.append(y_batch, np.array(df_sample.values[batch_index, 1]))
 
                 x_batch = x_batch.reshape((self.batch_size, self.num_timesteps, self.num_keys))
-                y_batch = y_batch.reshape((self.batch_size, self.num_timesteps, self.num_keys))
+
+                # old code when the output was num_timesteps
+                # y_batch = y_batch.reshape((self.batch_size, self.num_timesteps, self.num_keys))
+
+                # now the output is only the last timestep
+                y_batch = y_batch.reshape((self.batch_size, self.num_timesteps, self.num_keys))[:, -1, :].reshape((self.batch_size, 1, self.num_keys))
+
 
                 # train network
-                loss_result, train_result, sample_loss = sess.run([loss_summary, train, loss],
+                loss_result, train_result, sample_loss, dense_output = sess.run([loss_summary, train, loss, outputs],
                                                             feed_dict={x_placeholder: x_batch, y_placeholder: y_batch,
                                                                        learning_rate: self.learning_rate})
+
 
                 # record loss for TensorBoard
                 writer.add_summary(loss_result, curr_sample_counter)
@@ -175,15 +194,19 @@ class Model(object):
             while len(generated_time_series_data) < time_series_length:
                 print(len(generated_time_series_data))
                 curr_time_series = generated_time_series_data[-self.num_timesteps:, :].reshape(1, -1, 128)
-                pred_time_series = sess.run(tf.nn.softmax(logits=outputs), feed_dict={x_placeholder: curr_time_series})
+                pred_time_series = sess.run(outputs, feed_dict={x_placeholder: curr_time_series})
+
+                print()
 
                 # iterate through the last time step of the new notes and round to (1 or -1)
                 for note in range(0, 128, 1):
-                    if pred_time_series[0][-1][note] < 0.007:
-                        pred_time_series[0][-1][note] = -1
+                    random_boundary = np.random.normal(loc=-0.75, scale=0.035)
+                    # print(random_boundary)
+                    if (pred_time_series[0][note] < random_boundary) or (np.sum(generated_time_series_data[-16:, note]) == 16.0):
+                        pred_time_series[0][note] = -1
                     else:
-                        pred_time_series[0][-1][note] = 1
+                        pred_time_series[0][note] = 1
 
-                generated_time_series_data = np.append(generated_time_series_data, pred_time_series[0, -1, :]).reshape(-1, 128)
-                print()
+                generated_time_series_data = np.append(generated_time_series_data, pred_time_series[0, :]).reshape(-1, 128)
+
         return generated_time_series_data
