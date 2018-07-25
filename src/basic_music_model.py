@@ -57,7 +57,6 @@ class Model(object):
         # forget about the output wrapper
         # lstm_with_wrapper = tf.contrib.rnn.OutputProjectionWrapper(stacked_lstm, output_size=self.num_keys)
 
-
         lstm_outputs, states = tf.nn.dynamic_rnn(stacked_lstm, x_placeholder, dtype=tf.float32)
 
         # the output of stacked_lstm is [?, num_timesteps, num_neurons_inlayer], use tf.gather to get only the last time step
@@ -66,7 +65,7 @@ class Model(object):
         lstm_last_output = tf.gather(lstm_output_T, int(lstm_output_T.get_shape()[0]) - 1)
 
         # create a dense layer that connects the last time step output of 100 nodes to 128 keys
-        dense_output = tf.layers.dense(inputs=lstm_last_output, units=128, activation=steep_tanh)
+        dense_output = tf.layers.dense(inputs=lstm_last_output, units=128, activation=tf.nn.tanh)
 
         loss = tf.reduce_mean(tf.square(dense_output - y_placeholder))
 
@@ -197,10 +196,10 @@ class Model(object):
                 pred_time_series = sess.run(outputs, feed_dict={x_placeholder: curr_time_series})
 
                 print()
-
+                random_boundary = np.random.normal(loc=-0.78, scale=0.050)
                 # iterate through the last time step of the new notes and round to (1 or -1)
                 for note in range(0, 128, 1):
-                    random_boundary = np.random.normal(loc=-0.75, scale=0.035)
+
                     # print(random_boundary)
                     if (pred_time_series[0][note] < random_boundary) or (np.sum(generated_time_series_data[-16:, note]) == 16.0):
                         pred_time_series[0][note] = -1
