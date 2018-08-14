@@ -82,7 +82,7 @@ time_series_data = prep.simple_notes_to_time_series(simple_notes)
 # load model.pkl and tf graph
 MODEL_NAME = "small_midis_format0_ab_32ts_07-19--02-59"
 GRAPH_NAME = "small_midis_format0_ab_32ts_07-19--02-59"
-NUM_TIMESTEPS_TO_GENERATE = 100
+NUM_TIMESTEPS_TO_GENERATE = 500
 
 tmp = Model(" ", 128, 32, 2, 100, 0.001, 5)
 model = tmp.load(MODEL_NAME)

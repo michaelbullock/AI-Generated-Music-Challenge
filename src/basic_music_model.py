@@ -196,7 +196,9 @@ class Model(object):
                 pred_time_series = sess.run(outputs, feed_dict={x_placeholder: curr_time_series})
 
                 print()
-                random_boundary = np.random.normal(loc=-0.78, scale=0.050)
+                current_sum = np.sum(generated_time_series_data[-1])
+                cutoff = 0.003*current_sum - 0.396
+                random_boundary = np.random.normal(loc=cutoff, scale=0.030)
                 # iterate through the last time step of the new notes and round to (1 or -1)
                 for note in range(0, 128, 1):
 
