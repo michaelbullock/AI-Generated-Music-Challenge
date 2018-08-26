@@ -2,6 +2,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from music21 import *
+import pickle
+
+# for finding all midi files in a given directory
+from os import listdir
+from os.path import isfile, join
 
 
 class NoteData:
@@ -175,3 +180,37 @@ class MusicParser:
                             newNote.duration.quarterLength = 0.25
                         note_data.notes.append(newNote)
         return note_data
+
+
+def midis_to_parsed_songs(LOAD_DIR, SAVE_DIR, SAVE_NAME):
+    music_parser = MusicParser()
+
+    # LOAD_DIR = "../scales/"
+    # SAVE_DIR = "../data/"
+    # SAVE_NAME = "4scales_parsed"
+    all_files = [f for f in listdir(LOAD_DIR) if isfile(join(LOAD_DIR, f))]
+
+    # comb out all files that are not .mid
+    index = 0
+    while index < len(all_files):
+        if all_files[index][-4:] != ".mid":
+            del all_files[index]
+        else:
+            index += 1
+
+    # create list of all parsed songs that will be saved as a pickle
+    all_songs_time_series = []
+
+    # iterate over all midis in the directory
+    for score_name in all_files:
+        score = converter.parse(LOAD_DIR + score_name)
+
+        note_data = music_parser.score_to_note_data(score)
+        time_series = music_parser.note_data_to_time_series(note_data, 40, 80)
+
+        all_songs_time_series.append(time_series)
+
+
+    # saved parsed scores as a pickle
+    with open(SAVE_DIR + SAVE_NAME + ".pkl", 'wb') as f:
+        pickle.dump(all_songs_time_series, f, pickle.HIGHEST_PROTOCOL)
