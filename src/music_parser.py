@@ -1,6 +1,6 @@
 import numpy as np
-# import pandas as pd
-# import matplotlib.pyplot as plt
+import pandas as pd
+import matplotlib.pyplot as plt
 from music21 import *
 
 
@@ -19,6 +19,34 @@ class MusicParser:
     def __init__(self):
         pass
 
+    def get_smallest_note_value(self, note_data):
+        """takes in NoteData object and returns an integer for the lowest note (midi format)"""
+        temp = 300
+        for note in note_data.notes:
+            if note.isNote:
+                if temp > note.pitch.midi:
+                    temp = note.pitch.midi
+            elif note.isChord:
+                for component in note.pitches:
+                    if temp > component.midi:
+                        temp = component.midi
+
+        return temp
+
+    def get_largest_note_value(self, note_data):
+        """takes in NoteData object and returns an integer for the highest note (midi format)"""
+        temp = -1
+        for note in note_data.notes:
+            if note.isNote:
+                if temp < note.pitch.midi:
+                    temp = note.pitch.midi
+            elif note.isChord:
+                for component in note.pitches:
+                    if temp < component.midi:
+                        temp = component.midi
+
+        return temp
+
     def score_to_note_data(self, music):
         """takes in music21 score stream and outputs notedata object with longest list of notes, chords, and rests"""
         # limiting the score object to parts avoids issues with metadata and staffgroup
@@ -27,8 +55,9 @@ class MusicParser:
         hold = NoteData()
         # runs through elements of the song and stores into NoteData obj
         for element in music_parts.elements:
-            # added slur below to make function more universal
-            for thisNote in element.getElementsByClass(['Note', 'Chord', 'Rest']):
+            for thisNote in element.getElementsByClass(['Note', 'Chord']):
+                if thisNote.duration.quarterLength > 3:
+                    thisNote.duration.quarterLength = 4
                 hold.notes.append(thisNote)
             data.append(hold)
             hold = NoteData()
@@ -120,3 +149,29 @@ class MusicParser:
             else:
                 print(note)
         return time_series
+
+    def time_series_to_note_data(self, time_series, min_note):
+        s1 = stream.Stream()
+        note_data = NoteData()
+        for my_offset in range(len(time_series)):
+            for index in range(len(time_series[my_offset])):
+                if time_series[my_offset][index]:
+                    my_type = index % 7
+                    if my_type < 5:
+                        my_pitch = (index / 7) + min_note
+                        newNote = note.Note('C')
+                        newNote.pitch.midi = my_pitch
+                        s1.append(newNote)
+                        newNote.setOffsetBySite(s1, my_offset / 4.0)
+                        if my_type == 0:
+                            newNote.duration.quarterLength = 4
+                        elif my_type == 1:
+                            newNote.duration.quarterLength = 2
+                        elif my_type == 2:
+                            newNote.duration.quarterLength = 1
+                        elif my_type == 3:
+                            newNote.duration.quarterLength = 0.5
+                        elif my_type == 4:
+                            newNote.duration.quarterLength = 0.25
+                        note_data.notes.append(newNote)
+        return note_data

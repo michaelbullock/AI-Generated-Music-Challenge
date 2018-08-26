@@ -24,4 +24,4 @@ df = pd.read_pickle("../data/" + df_file + ".pkl")
 model = Model(df_file, num_keys, num_timesteps, num_layers, num_neurons_inlayer, learning_rate, batch_size)
 
 model.train_model(df, num_samples_to_train, save_every=save_every)
-
+    
