@@ -1,6 +1,6 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
+# import pandas as pd
+# import matplotlib.pyplot as plt
 from music21 import *
 
 
@@ -19,7 +19,7 @@ class MusicParser:
     def __init__(self):
         pass
 
-    def score_to_note_data(music):
+    def score_to_note_data(self, music):
         """takes in music21 score stream and outputs notedata object with longest list of notes, chords, and rests"""
         # limiting the score object to parts avoids issues with metadata and staffgroup
         music_parts = music.parts
@@ -38,7 +38,7 @@ class MusicParser:
                 note_data = part
         return note_data
 
-    def note_data_to_time_series(note_data, min_note, note_range):
+    def note_data_to_time_series(self, note_data, min_note, note_range):
         """takes a notedata object and outputs an array of timeseries data"""
         WHOLE = np.array([1, 0, 0, 0, 0, 0, 0], dtype=bool)
         HALF = np.array([0, 1, 0, 0, 0, 0, 0], dtype=bool)
