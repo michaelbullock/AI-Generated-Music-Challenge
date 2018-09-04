@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 from music21 import *
 import pickle
 
+import datetime
+
 # for finding all midi files in a given directory
 from os import listdir
 from os.path import isfile, join
@@ -55,12 +57,17 @@ class MusicParser:
     def score_to_note_data(self, music):
         """takes in music21 score stream and outputs notedata object with longest list of notes, chords, and rests"""
         # limiting the score object to parts avoids issues with metadata and staffgroup
-        music_parts = music.parts
+
+        k = music.analyze('key')
+        i = interval.Interval(k.tonic, pitch.Pitch('C'))
+        new_music = music.transpose(i)
+        music_parts = new_music.parts
+        music_parts = music_parts.voicesToParts()
         data = []
         hold = NoteData()
         # runs through elements of the song and stores into NoteData obj
         for element in music_parts.elements:
-            for thisNote in element.getElementsByClass(['Note', 'Chord']):
+            for thisNote in element.getElementsByClass(['Note', 'Chord', 'Voice']):
                 if thisNote.duration.quarterLength > 3:
                     thisNote.duration.quarterLength = 4
                 hold.notes.append(thisNote)
@@ -125,7 +132,7 @@ class MusicParser:
                     time_series[note_position, note_value * 7:note_value * 7 + 7] = one_hot
             elif note.isChord:
                 for component in note.pitches:
-                    note_value = component.midi
+                    note_value = component.midi - min_note
                     note_position = int(note.offset * 4)
                     note_type = note.duration.type
                     if 0 <= note_value < note_range:
@@ -147,27 +154,25 @@ class MusicParser:
                         else:
                             one_hot = np.array([0, 0, 0, 0, 0, 0, 0], dtype=bool)
                             note_duration = 0
-                        # section off the duration of note here
                         for i in range(note_position, note_position + note_duration):
                             time_series[i, note_value * 7:note_value * 7 + 7] = NON
+                        # add the one hot vector for the note hit
                         time_series[note_position, note_value * 7:note_value * 7 + 7] = one_hot
             else:
                 print(note)
         return time_series
 
-    def time_series_to_note_data(self, time_series, min_note):
-        s1 = stream.Stream()
-        note_data = NoteData()
+    def time_series_to_midi(self, time_series, min_note, filepath):
+        """creates a midi file at location specified by filepath arg"""
+        s1 = stream.Part()
         for my_offset in range(len(time_series)):
             for index in range(len(time_series[my_offset])):
                 if time_series[my_offset][index]:
                     my_type = index % 7
                     if my_type < 5:
-                        my_pitch = (index / 7) + min_note
+                        my_pitch = (index // 7) + min_note
                         newNote = note.Note('C')
                         newNote.pitch.midi = my_pitch
-                        s1.append(newNote)
-                        newNote.setOffsetBySite(s1, my_offset / 4.0)
                         if my_type == 0:
                             newNote.duration.quarterLength = 4
                         elif my_type == 1:
@@ -178,8 +183,18 @@ class MusicParser:
                             newNote.duration.quarterLength = 0.5
                         elif my_type == 4:
                             newNote.duration.quarterLength = 0.25
-                        note_data.notes.append(newNote)
-        return note_data
+                        s1.insertIntoNoteOrChord(my_offset / 4.0, newNote)
+                        # note_data.notes.append(newNote)
+        # parser = MusicParser()
+        score = stream.Score()
+        score.insert(0, s1)
+        # note_data = parser.score_to_note_data(score)
+        mf = midi.translate.streamToMidiFile(score)
+        midi_fp = filepath + '/' + datetime.datetime.now().strftime("%m-%d--%H-%M") + '.mid'
+        mf.open(midi_fp, 'wb')
+        mf.write()
+        mf.close()
+        return
 
 
 def midis_to_parsed_songs(LOAD_DIR, SAVE_DIR, SAVE_NAME):
