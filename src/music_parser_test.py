@@ -4,9 +4,9 @@ from music_parser import *
 
 parser = MusicParser()
 
-MIDI_PATH = 'C:/Users/micha/Documents'
+MIDI_PATH = '../midis/'
 
-score = converter.parse(r'C:\Users\micha\Documents\Music Generation Challenge\ty_november.mid')
+score = converter.parse(r'' + '../midis/alb_esp1_format0.mid')
 
 note_data = parser.score_to_note_data(score)
 
@@ -21,4 +21,3 @@ print(time_series)
 note_data2 = parser.time_series_to_midi(time_series, min, MIDI_PATH)
 
 print(time_series)
-
