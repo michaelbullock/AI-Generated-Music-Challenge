@@ -54,14 +54,18 @@ for df_index in range(2):
     print("-----------------")
 
 """
+#
+# l = np.array([0, 1, 2, 3])
+# s = np.array([0, 1])
+# print(l)
+#
+# l[2:] = s
+# print(l)
+#
+# s[0] = 1111
+# print(l)
 
-l = np.array([0, 1, 2, 3])
-s = np.array([0, 1])
-print(l)
+x = [0, 1, 2, 3, 4, 5, 6]
 
-l[2:] = s
-print(l)
-
-s[0] = 1111
-print(l)
-
+print(len(x[1:-1]))
+print(np.argmin(x[1:-1]))

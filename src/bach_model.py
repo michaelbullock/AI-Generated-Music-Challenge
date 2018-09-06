@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import datetime
 import pickle
-# from music_parser import *
+from music_parser import *
 
 # for getting all files in a directory
 from os import listdir
@@ -256,17 +256,91 @@ def training_test_2():
 
 
 def generate(model_path_and_name):
+    # network hyper parameters
+    NUM_NOTES = 60
+    ONEHOT_LENGTH = 7  # whole, half, half-rest, null
+    NUM_TIMESTEPS = 5
+    BATCH_SIZE = 1
+    LEARNING_RATE = 0.001
+    NETWORK_LAYERS = [ONEHOT_LENGTH*NUM_NOTES, ONEHOT_LENGTH*NUM_NOTES]
+
+
+    TIMESTEPS_TO_SAMPLE = 100
+
+    # load parsed songs to get some starter
+    PARSED_SONGS = "../data/4scales.pkl"
+    with open(PARSED_SONGS, 'rb') as f:
+        songs_parsed = pickle.load(f)
+
+    # build graph
+    init, train, loss, notes_in_placeholder, notes_out_placeholder, softmax_notes_output = \
+        build_graph(ONEHOT_LENGTH, NUM_TIMESTEPS, NUM_NOTES, LEARNING_RATE, NETWORK_LAYERS)
+
+    # for loading the model
+    saver = tf.train.Saver(max_to_keep=100)
+
+    # start session
+    with tf.Session() as sess:
+        sess.run(tf.global_variables_initializer())
+
+        # restore our model
+        saver.restore(sess, model_path_and_name)
+
+
+        # use the beginning of a song as the starter
+        X, y = get_batch(songs_parsed, ONEHOT_LENGTH, NUM_NOTES, BATCH_SIZE, NUM_TIMESTEPS)
+
+        # the written_song variable will hold the starting notes and predicted notes
+        written_song = X[0]
+
+        timesteps_sampled = 0
+        while timesteps_sampled < TIMESTEPS_TO_SAMPLE:
+
+            timesteps_sampled += 1
+
+            # run graph and get batch loss
+            note_predictions = sess.run([softmax_notes_output],
+                                                       feed_dict={notes_in_placeholder: [written_song[-NUM_TIMESTEPS:, :]]})
+
+            last_timestep = note_predictions[0][0][-1][:].reshape(-1)
+
+            written_song = np.append(written_song, last_timestep).reshape(-1, ONEHOT_LENGTH*NUM_NOTES)
+
+            print()
+
+    # time_series_to_midi(self, time_series, min_note, filepath):
+    parser = MusicParser()
+
+
+    #### Sketchy code to round all one-hot vectors
+    for timestep in range(len(written_song)):
+        for index_divided in range(int(len(written_song[timestep]) / 7)):
+            starting_index = index_divided * 7
+            ending_index = starting_index + 7
+
+            max = np.argmax(written_song[0, starting_index:ending_index]) + starting_index
+
+            for index in range(starting_index, ending_index):
+                if index == max:
+                    written_song[timestep][index] = 1
+                else:
+                    written_song[timestep][index] = 0
+
+
+    parser.time_series_to_midi(written_song, 30, "../gen/")
+
+
 
 
 
 # training_test()
 
 
-# path_to_midis = "../midis_to_parse/"
-# save_path_and_name = "../data/3_scales_7_songs"
+# path_to_midis = "../scales/"
+# save_path_and_name = "../data/4scales"
 # midis_to_time_series_pickle(path_to_midis, save_path_and_name)
 
-#
+
 # with open("../data/3_scales_7_songs.pkl", 'rb') as f:
 #     songs = pickle.load(f)
 #
@@ -276,7 +350,7 @@ def generate(model_path_and_name):
 # batch = get_batch(songs, 7, 60, 3, 4)
 #
 # print()
-#
+
 
 # training_test_2()
-generate("./models/training_test_09-05--01-47")
+generate("../models/training_test_09-05--01-47")
