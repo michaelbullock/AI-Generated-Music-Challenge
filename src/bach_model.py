@@ -193,19 +193,19 @@ def training_test():
         writer.close()
 
 # training with real parsed music data
-def training_test_2():
+def training_test_2(PARSED_SONGS):
     # network hyper parameters
     NUM_NOTES = 60
-    ONEHOT_LENGTH = 7  # whole, half, half-rest, null
-    NUM_TIMESTEPS = 5
-    BATCH_SIZE = 4
+    ONEHOT_LENGTH = 7
+    NUM_TIMESTEPS = 64  # four whole notes long (1 bar in 4/4)
+    BATCH_SIZE = 25
     LEARNING_RATE = 0.001
     NETWORK_LAYERS = [ONEHOT_LENGTH*NUM_NOTES, ONEHOT_LENGTH*NUM_NOTES]
 
     NUM_SAMPLES_TO_TRAIN = 150*10000
     SAVE_EVERY = 100000
 
-    PARSED_SONGS = "../data/3_scales_7_songs.pkl"
+
     with open(PARSED_SONGS, 'rb') as f:
         songs_parsed = pickle.load(f)
 
@@ -258,9 +258,9 @@ def training_test_2():
 def generate(model_path_and_name):
     # network hyper parameters
     NUM_NOTES = 60
-    ONEHOT_LENGTH = 7  # whole, half, half-rest, null
-    NUM_TIMESTEPS = 5
-    BATCH_SIZE = 1
+    ONEHOT_LENGTH = 7
+    NUM_TIMESTEPS = 64  # four whole notes long (1 bar in 4/4)
+    BATCH_SIZE = 25
     LEARNING_RATE = 0.001
     NETWORK_LAYERS = [ONEHOT_LENGTH*NUM_NOTES, ONEHOT_LENGTH*NUM_NOTES]
 
@@ -268,7 +268,7 @@ def generate(model_path_and_name):
     TIMESTEPS_TO_SAMPLE = 100
 
     # load parsed songs to get some starter
-    PARSED_SONGS = "../data/4scales.pkl"
+    PARSED_SONGS = "../data/7songs.pkl"
     with open(PARSED_SONGS, 'rb') as f:
         songs_parsed = pickle.load(f)
 
@@ -306,8 +306,6 @@ def generate(model_path_and_name):
 
             written_song = np.append(written_song, last_timestep).reshape(-1, ONEHOT_LENGTH*NUM_NOTES)
 
-            print()
-
     # time_series_to_midi(self, time_series, min_note, filepath):
     parser = MusicParser()
 
@@ -327,7 +325,7 @@ def generate(model_path_and_name):
                     written_song[timestep][index] = 0
 
 
-    parser.time_series_to_midi(written_song, 30, "../gen/")
+    parser.time_series_to_midi(written_song, 30, "../gen")
 
 
 
@@ -336,10 +334,10 @@ def generate(model_path_and_name):
 # training_test()
 
 
-# path_to_midis = "../scales/"
-# save_path_and_name = "../data/4scales"
+# path_to_midis = "../midis_to_parse/"
+# save_path_and_name = "../data/7songs"
 # midis_to_time_series_pickle(path_to_midis, save_path_and_name)
-
+#
 
 # with open("../data/3_scales_7_songs.pkl", 'rb') as f:
 #     songs = pickle.load(f)
@@ -352,5 +350,19 @@ def generate(model_path_and_name):
 # print()
 
 
-# training_test_2()
-generate("../models/training_test_09-05--01-47")
+#training_test_2(PARSED_SONGS="../data/7songs.pkl")
+generate("../models/training_test_09-18--07-13")
+
+
+"""
+TO DO:
+
+- re-rewrite sample function to actually sample
+- sample before feeding back in
+- get good starting notes
+- clean up code & push (why are there 2 "training" functions)
+
+
+
+
+"""
