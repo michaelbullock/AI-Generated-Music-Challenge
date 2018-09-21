@@ -259,7 +259,7 @@ def generate(model_path_and_name):
     # network hyper parameters
     NUM_NOTES = 60
     ONEHOT_LENGTH = 7
-    NUM_TIMESTEPS = 64  # four whole notes long (1 bar in 4/4)
+    NUM_TIMESTEPS = 32  # four whole notes long (1 bar in 4/4)
     BATCH_SIZE = 25
     LEARNING_RATE = 0.001
     NETWORK_LAYERS = [ONEHOT_LENGTH*NUM_NOTES, ONEHOT_LENGTH*NUM_NOTES]
@@ -268,7 +268,7 @@ def generate(model_path_and_name):
     TIMESTEPS_TO_SAMPLE = 100
 
     # load parsed songs to get some starter
-    PARSED_SONGS = "../data/7songs.pkl"
+    PARSED_SONGS = "../data/1ex.pkl"
     with open(PARSED_SONGS, 'rb') as f:
         songs_parsed = pickle.load(f)
 
@@ -298,38 +298,81 @@ def generate(model_path_and_name):
 
             timesteps_sampled += 1
 
+            feed_in = written_song[-NUM_TIMESTEPS:, :]
+
             # run graph and get batch loss
             note_predictions = sess.run([softmax_notes_output],
-                                                       feed_dict={notes_in_placeholder: [written_song[-NUM_TIMESTEPS:, :]]})
+                                                       feed_dict={notes_in_placeholder: [feed_in]})
 
+            # grab last timestep
             last_timestep = note_predictions[0][0][-1][:].reshape(-1)
 
+            # sample from timesteps
+            for index_divided in range(int(len(last_timestep) / 7)):
+                starting_index = index_divided * 7
+                ending_index = starting_index + 7
+
+                distribution = written_song[0, starting_index:ending_index]
+
+                chosen_index = sample_note_from_softmax(distribution) + starting_index
+
+                for index in range(starting_index, ending_index):
+                    if index == chosen_index:
+                        last_timestep[index] = 1
+                    else:
+                        last_timestep[index] = 0
+
+            # append sampled last timestep
             written_song = np.append(written_song, last_timestep).reshape(-1, ONEHOT_LENGTH*NUM_NOTES)
 
     # time_series_to_midi(self, time_series, min_note, filepath):
     parser = MusicParser()
 
-
-    #### Sketchy code to round all one-hot vectors
-    for timestep in range(len(written_song)):
-        for index_divided in range(int(len(written_song[timestep]) / 7)):
-            starting_index = index_divided * 7
-            ending_index = starting_index + 7
-
-            max = np.argmax(written_song[0, starting_index:ending_index]) + starting_index
-
-            for index in range(starting_index, ending_index):
-                if index == max:
-                    written_song[timestep][index] = 1
-                else:
-                    written_song[timestep][index] = 0
-
-
-    parser.time_series_to_midi(written_song, 30, "../gen")
+    # #### Sketchy code to round all one-hot vectors
+    # for timestep in range(len(written_song)):
+    #     for index_divided in range(int(len(written_song[timestep]) / 7)):
+    #         starting_index = index_divided * 7
+    #         ending_index = starting_index + 7
+    #
+    #         distribution = written_song[0, starting_index:ending_index]
+    #
+    #         chosen_index = sample_note_from_softmax(distribution) + starting_index
+    #
+    #         for index in range(starting_index, ending_index):
+    #             if index == chosen_index:
+    #                 written_song[timestep][index] = 1
+    #             else:
+    #                 written_song[timestep][index] = 0
 
 
+    parser.time_series_to_midi(written_song[:-1, :], 30, "../gen")
 
 
+
+def sample_note_from_softmax(distrubution):
+
+    random_num = np.random.uniform(0, 1, 1)
+    curr_index = 0
+    curr_sum = distrubution[curr_index]
+    while curr_sum < random_num:
+        curr_index += 1
+        curr_sum += distrubution[curr_index]
+
+    return curr_index
+
+
+
+
+
+
+### test softmax
+
+# arr1 = [0.10, 0.10, 0.10, 0.70]
+#
+# for x in range(10):
+#     print(sample_note_from_softmax(arr1))
+#
+# raise SystemExit
 
 # training_test()
 
@@ -351,7 +394,7 @@ def generate(model_path_and_name):
 
 
 #training_test_2(PARSED_SONGS="../data/7songs.pkl")
-generate("../models/training_test_09-18--07-13")
+generate("../models/training_test_09-05--01-47")
 
 
 """
@@ -366,3 +409,6 @@ TO DO:
 
 
 """
+
+
+# midis_to_time_series_pickle("../midis/", "../data/4_schuberts_forBach")
