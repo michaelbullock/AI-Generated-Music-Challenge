@@ -1,0 +1,420 @@
+/usr/bin/python3.5 /home/n/AI-Generated-Music-Challenge/src/bach_model.py
+/usr/local/lib/python3.5/dist-packages/h5py/__init__.py:36: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated. In future, it will be treated as `np.float64 == np.dtype(float).type`.
+  from ._conv import register_converters as _register_converters
+WARNING:tensorflow:From /home/n/.local/lib/python3.5/site-packages/tensorflow/contrib/learn/python/learn/datasets/base.py:198: retry (from tensorflow.contrib.learn.python.learn.datasets.base) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use the retry module or similar alternatives.
+WARNING:tensorflow:From /home/n/AI-Generated-Music-Challenge/src/bach_model.py:122: softmax_cross_entropy_with_logits (from tensorflow.python.ops.nn_ops) is deprecated and will be removed in a future version.
+Instructions for updating:
+
+Future major versions of TensorFlow will allow gradients to flow
+into the labels input on backprop by default.
+
+See tf.nn.softmax_cross_entropy_with_logits_v2.
+
+2018-12-17 13:18:14.447472: I tensorflow/stream_executor/cuda/cuda_gpu_executor.cc:898] successful NUMA node read from SysFS had negative value (-1), but there must be at least one NUMA node, so returning NUMA node zero
+2018-12-17 13:18:14.447704: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1344] Found device 0 with properties:
+name: GeForce GTX 650 Ti BOOST major: 3 minor: 0 memoryClockRate(GHz): 1.137
+pciBusID: 0000:01:00.0
+totalMemory: 1.95GiB freeMemory: 1.49GiB
+2018-12-17 13:18:14.447720: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1423] Adding visible gpu devices: 0
+2018-12-17 13:18:14.982109: I tensorflow/core/common_runtime/gpu/gpu_device.cc:911] Device interconnect StreamExecutor with strength 1 edge matrix:
+2018-12-17 13:18:14.982148: I tensorflow/core/common_runtime/gpu/gpu_device.cc:917]      0
+2018-12-17 13:18:14.982158: I tensorflow/core/common_runtime/gpu/gpu_device.cc:930] 0:   N
+2018-12-17 13:18:14.982864: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1041] Created TensorFlow device (/job:localhost/replica:0/task:0/device:GPU:0 with 1267 MB memory) -> physical GPU (device: 0, name: GeForce GTX 650 Ti BOOST, pci bus id: 0000:01:00.0, compute capability: 3.0)
+Starting training at: 12-17--13-18
+saving loss to: ../logs/test_more_layers_12-17--13-18
+Trained 0 samples: 12-17--13-18
+saving model to: ../test_more_layers/test_more_layers_12-17--13-18
+Trained 5000 samples: 12-17--13-20
+Trained 10000 samples: 12-17--13-22
+Trained 15000 samples: 12-17--13-24
+Trained 20000 samples: 12-17--13-26
+Trained 25000 samples: 12-17--13-28
+Trained 30000 samples: 12-17--13-30
+Trained 35000 samples: 12-17--13-32
+Trained 40000 samples: 12-17--13-34
+Trained 45000 samples: 12-17--13-36
+Trained 50000 samples: 12-17--13-38
+saving model to: ../test_more_layers/test_more_layers_12-17--13-38
+Trained 55000 samples: 12-17--13-40
+Trained 60000 samples: 12-17--13-42
+Trained 65000 samples: 12-17--13-44
+Trained 70000 samples: 12-17--13-46
+Trained 75000 samples: 12-17--13-48
+Trained 80000 samples: 12-17--13-50
+Trained 85000 samples: 12-17--13-52
+Trained 90000 samples: 12-17--13-54
+Trained 95000 samples: 12-17--13-56
+Trained 100000 samples: 12-17--13-58
+saving model to: ../test_more_layers/test_more_layers_12-17--13-58
+Trained 105000 samples: 12-17--14-00
+Trained 110000 samples: 12-17--14-02
+Trained 115000 samples: 12-17--14-04
+Trained 120000 samples: 12-17--14-06
+Trained 125000 samples: 12-17--14-08
+Trained 130000 samples: 12-17--14-10
+Trained 135000 samples: 12-17--14-12
+Trained 140000 samples: 12-17--14-14
+Trained 145000 samples: 12-17--14-16
+Trained 150000 samples: 12-17--14-18
+saving model to: ../test_more_layers/test_more_layers_12-17--14-18
+Trained 155000 samples: 12-17--14-20
+Trained 160000 samples: 12-17--14-22
+Trained 165000 samples: 12-17--14-24
+Trained 170000 samples: 12-17--14-26
+Trained 175000 samples: 12-17--14-28
+Trained 180000 samples: 12-17--14-31
+Trained 185000 samples: 12-17--14-33
+Trained 190000 samples: 12-17--14-35
+Trained 195000 samples: 12-17--14-37
+Trained 200000 samples: 12-17--14-39
+saving model to: ../test_more_layers/test_more_layers_12-17--14-39
+Trained 205000 samples: 12-17--14-41
+Trained 210000 samples: 12-17--14-43
+Trained 215000 samples: 12-17--14-45
+Trained 220000 samples: 12-17--14-47
+Trained 225000 samples: 12-17--14-49
+Trained 230000 samples: 12-17--14-51
+Trained 235000 samples: 12-17--14-53
+Trained 240000 samples: 12-17--14-55
+Trained 245000 samples: 12-17--14-57
+Trained 250000 samples: 12-17--14-59
+saving model to: ../test_more_layers/test_more_layers_12-17--14-59
+Trained 255000 samples: 12-17--15-01
+Trained 260000 samples: 12-17--15-03
+Trained 265000 samples: 12-17--15-05
+Trained 270000 samples: 12-17--15-07
+Trained 275000 samples: 12-17--15-09
+Trained 280000 samples: 12-17--15-11
+Trained 285000 samples: 12-17--15-13
+Trained 290000 samples: 12-17--15-15
+Trained 295000 samples: 12-17--15-17
+Trained 300000 samples: 12-17--15-19
+saving model to: ../test_more_layers/test_more_layers_12-17--15-19
+Trained 305000 samples: 12-17--15-21
+Trained 310000 samples: 12-17--15-23
+Trained 315000 samples: 12-17--15-25
+Trained 320000 samples: 12-17--15-27
+Trained 325000 samples: 12-17--15-29
+Trained 330000 samples: 12-17--15-31
+Trained 335000 samples: 12-17--15-33
+Trained 340000 samples: 12-17--15-35
+Trained 345000 samples: 12-17--15-37
+Trained 350000 samples: 12-17--15-39
+saving model to: ../test_more_layers/test_more_layers_12-17--15-39
+Trained 355000 samples: 12-17--15-41
+Trained 360000 samples: 12-17--15-43
+Trained 365000 samples: 12-17--15-45
+Trained 370000 samples: 12-17--15-47
+Trained 375000 samples: 12-17--15-49
+Trained 380000 samples: 12-17--15-51
+Trained 385000 samples: 12-17--15-53
+Trained 390000 samples: 12-17--15-56
+Trained 395000 samples: 12-17--15-58
+Trained 400000 samples: 12-17--16-00
+saving model to: ../test_more_layers/test_more_layers_12-17--16-00
+Trained 405000 samples: 12-17--16-02
+Trained 410000 samples: 12-17--16-04
+Trained 415000 samples: 12-17--16-06
+Trained 420000 samples: 12-17--16-08
+Trained 425000 samples: 12-17--16-10
+Trained 430000 samples: 12-17--16-12
+Trained 435000 samples: 12-17--16-14
+Trained 440000 samples: 12-17--16-16
+Trained 445000 samples: 12-17--16-18
+Trained 450000 samples: 12-17--16-20
+saving model to: ../test_more_layers/test_more_layers_12-17--16-20
+Trained 455000 samples: 12-17--16-22
+Trained 460000 samples: 12-17--16-24
+Trained 465000 samples: 12-17--16-26
+Trained 470000 samples: 12-17--16-28
+Trained 475000 samples: 12-17--16-30
+Trained 480000 samples: 12-17--16-32
+Trained 485000 samples: 12-17--16-34
+Trained 490000 samples: 12-17--16-36
+Trained 495000 samples: 12-17--16-38
+Trained 500000 samples: 12-17--16-40
+saving model to: ../test_more_layers/test_more_layers_12-17--16-40
+Trained 505000 samples: 12-17--16-42
+Trained 510000 samples: 12-17--16-44
+Trained 515000 samples: 12-17--16-46
+Trained 520000 samples: 12-17--16-48
+Trained 525000 samples: 12-17--16-50
+Trained 530000 samples: 12-17--16-52
+Trained 535000 samples: 12-17--16-54
+Trained 540000 samples: 12-17--16-56
+Trained 545000 samples: 12-17--16-58
+Trained 550000 samples: 12-17--17-00
+saving model to: ../test_more_layers/test_more_layers_12-17--17-00
+Trained 555000 samples: 12-17--17-02
+Trained 560000 samples: 12-17--17-04
+Trained 565000 samples: 12-17--17-06
+Trained 570000 samples: 12-17--17-08
+Trained 575000 samples: 12-17--17-10
+Trained 580000 samples: 12-17--17-12
+Trained 585000 samples: 12-17--17-14
+Trained 590000 samples: 12-17--17-16
+Trained 595000 samples: 12-17--17-18
+Trained 600000 samples: 12-17--17-20
+saving model to: ../test_more_layers/test_more_layers_12-17--17-20
+Trained 605000 samples: 12-17--17-23
+Trained 610000 samples: 12-17--17-25
+Trained 615000 samples: 12-17--17-27
+Trained 620000 samples: 12-17--17-29
+Trained 625000 samples: 12-17--17-31
+Trained 630000 samples: 12-17--17-33
+Trained 635000 samples: 12-17--17-35
+Trained 640000 samples: 12-17--17-37
+Trained 645000 samples: 12-17--17-39
+Trained 650000 samples: 12-17--17-41
+saving model to: ../test_more_layers/test_more_layers_12-17--17-41
+Trained 655000 samples: 12-17--17-43
+Trained 660000 samples: 12-17--17-45
+Trained 665000 samples: 12-17--17-47
+Trained 670000 samples: 12-17--17-49
+Trained 675000 samples: 12-17--17-51
+Trained 680000 samples: 12-17--17-53
+Trained 685000 samples: 12-17--17-55
+Trained 690000 samples: 12-17--17-57
+Trained 695000 samples: 12-17--17-59
+Trained 700000 samples: 12-17--18-01
+saving model to: ../test_more_layers/test_more_layers_12-17--18-01
+Trained 705000 samples: 12-17--18-03
+Trained 710000 samples: 12-17--18-05
+Trained 715000 samples: 12-17--18-07
+Trained 720000 samples: 12-17--18-09
+Trained 725000 samples: 12-17--18-11
+Trained 730000 samples: 12-17--18-13
+Trained 735000 samples: 12-17--18-15
+Trained 740000 samples: 12-17--18-17
+Trained 745000 samples: 12-17--18-19
+Trained 750000 samples: 12-17--18-21
+saving model to: ../test_more_layers/test_more_layers_12-17--18-21
+Trained 755000 samples: 12-17--18-23
+Trained 760000 samples: 12-17--18-25
+Trained 765000 samples: 12-17--18-27
+Trained 770000 samples: 12-17--18-29
+Trained 775000 samples: 12-17--18-31
+Trained 780000 samples: 12-17--18-33
+Trained 785000 samples: 12-17--18-35
+Trained 790000 samples: 12-17--18-37
+Trained 795000 samples: 12-17--18-39
+Trained 800000 samples: 12-17--18-41
+saving model to: ../test_more_layers/test_more_layers_12-17--18-41
+Trained 805000 samples: 12-17--18-43
+Trained 810000 samples: 12-17--18-46
+Trained 815000 samples: 12-17--18-48
+Trained 820000 samples: 12-17--18-50
+Trained 825000 samples: 12-17--18-52
+Trained 830000 samples: 12-17--18-54
+Trained 835000 samples: 12-17--18-56
+Trained 840000 samples: 12-17--18-58
+Trained 845000 samples: 12-17--19-00
+Trained 850000 samples: 12-17--19-02
+saving model to: ../test_more_layers/test_more_layers_12-17--19-02
+Trained 855000 samples: 12-17--19-04
+Trained 860000 samples: 12-17--19-06
+Trained 865000 samples: 12-17--19-08
+Trained 870000 samples: 12-17--19-10
+Trained 875000 samples: 12-17--19-12
+Trained 880000 samples: 12-17--19-14
+Trained 885000 samples: 12-17--19-16
+Trained 890000 samples: 12-17--19-18
+Trained 895000 samples: 12-17--19-20
+Trained 900000 samples: 12-17--19-22
+saving model to: ../test_more_layers/test_more_layers_12-17--19-22
+Trained 905000 samples: 12-17--19-24
+Trained 910000 samples: 12-17--19-26
+Trained 915000 samples: 12-17--19-28
+Trained 920000 samples: 12-17--19-30
+Trained 925000 samples: 12-17--19-32
+Trained 930000 samples: 12-17--19-34
+Trained 935000 samples: 12-17--19-36
+Trained 940000 samples: 12-17--19-38
+Trained 945000 samples: 12-17--19-40
+Trained 950000 samples: 12-17--19-42
+saving model to: ../test_more_layers/test_more_layers_12-17--19-42
+Trained 955000 samples: 12-17--19-44
+Trained 960000 samples: 12-17--19-46
+Trained 965000 samples: 12-17--19-48
+Trained 970000 samples: 12-17--19-50
+Trained 975000 samples: 12-17--19-52
+Trained 980000 samples: 12-17--19-54
+Trained 985000 samples: 12-17--19-56
+Trained 990000 samples: 12-17--19-58
+Trained 995000 samples: 12-17--20-00
+Trained 1000000 samples: 12-17--20-02
+saving model to: ../test_more_layers/test_more_layers_12-17--20-02
+Trained 1005000 samples: 12-17--20-05
+Trained 1010000 samples: 12-17--20-07
+Trained 1015000 samples: 12-17--20-09
+Trained 1020000 samples: 12-17--20-11
+Trained 1025000 samples: 12-17--20-13
+Trained 1030000 samples: 12-17--20-15
+Trained 1035000 samples: 12-17--20-17
+Trained 1040000 samples: 12-17--20-19
+Trained 1045000 samples: 12-17--20-21
+Trained 1050000 samples: 12-17--20-23
+saving model to: ../test_more_layers/test_more_layers_12-17--20-23
+Trained 1055000 samples: 12-17--20-25
+Trained 1060000 samples: 12-17--20-27
+Trained 1065000 samples: 12-17--20-29
+Trained 1070000 samples: 12-17--20-31
+Trained 1075000 samples: 12-17--20-33
+Trained 1080000 samples: 12-17--20-35
+Trained 1085000 samples: 12-17--20-37
+Trained 1090000 samples: 12-17--20-39
+Trained 1095000 samples: 12-17--20-41
+Trained 1100000 samples: 12-17--20-43
+saving model to: ../test_more_layers/test_more_layers_12-17--20-43
+Trained 1105000 samples: 12-17--20-45
+Trained 1110000 samples: 12-17--20-47
+Trained 1115000 samples: 12-17--20-49
+Trained 1120000 samples: 12-17--20-51
+Trained 1125000 samples: 12-17--20-53
+Trained 1130000 samples: 12-17--20-55
+Trained 1135000 samples: 12-17--20-57
+Trained 1140000 samples: 12-17--20-59
+Trained 1145000 samples: 12-17--21-01
+Trained 1150000 samples: 12-17--21-03
+saving model to: ../test_more_layers/test_more_layers_12-17--21-03
+Trained 1155000 samples: 12-17--21-05
+Trained 1160000 samples: 12-17--21-07
+Trained 1165000 samples: 12-17--21-09
+Trained 1170000 samples: 12-17--21-11
+Trained 1175000 samples: 12-17--21-13
+Trained 1180000 samples: 12-17--21-15
+Trained 1185000 samples: 12-17--21-17
+Trained 1190000 samples: 12-17--21-19
+Trained 1195000 samples: 12-17--21-21
+Trained 1200000 samples: 12-17--21-23
+saving model to: ../test_more_layers/test_more_layers_12-17--21-23
+Trained 1205000 samples: 12-17--21-25
+Trained 1210000 samples: 12-17--21-27
+Trained 1215000 samples: 12-17--21-30
+Trained 1220000 samples: 12-17--21-32
+Trained 1225000 samples: 12-17--21-34
+Trained 1230000 samples: 12-17--21-36
+Trained 1235000 samples: 12-17--21-38
+Trained 1240000 samples: 12-17--21-40
+Trained 1245000 samples: 12-17--21-42
+Trained 1250000 samples: 12-17--21-44
+saving model to: ../test_more_layers/test_more_layers_12-17--21-44
+Trained 1255000 samples: 12-17--21-46
+Trained 1260000 samples: 12-17--21-48
+Trained 1265000 samples: 12-17--21-50
+Trained 1270000 samples: 12-17--21-52
+Trained 1275000 samples: 12-17--21-54
+Trained 1280000 samples: 12-17--21-56
+Trained 1285000 samples: 12-17--21-58
+Trained 1290000 samples: 12-17--22-00
+Trained 1295000 samples: 12-17--22-02
+Trained 1300000 samples: 12-17--22-04
+saving model to: ../test_more_layers/test_more_layers_12-17--22-04
+Trained 1305000 samples: 12-17--22-06
+Trained 1310000 samples: 12-17--22-08
+Trained 1315000 samples: 12-17--22-10
+Trained 1320000 samples: 12-17--22-12
+Trained 1325000 samples: 12-17--22-14
+Trained 1330000 samples: 12-17--22-16
+Trained 1335000 samples: 12-17--22-18
+Trained 1340000 samples: 12-17--22-20
+Trained 1345000 samples: 12-17--22-22
+Trained 1350000 samples: 12-17--22-24
+saving model to: ../test_more_layers/test_more_layers_12-17--22-24
+Trained 1355000 samples: 12-17--22-26
+Trained 1360000 samples: 12-17--22-28
+Trained 1365000 samples: 12-17--22-30
+Trained 1370000 samples: 12-17--22-32
+Trained 1375000 samples: 12-17--22-34
+Trained 1380000 samples: 12-17--22-36
+Trained 1385000 samples: 12-17--22-38
+Trained 1390000 samples: 12-17--22-40
+Trained 1395000 samples: 12-17--22-42
+Trained 1400000 samples: 12-17--22-44
+saving model to: ../test_more_layers/test_more_layers_12-17--22-44
+Trained 1405000 samples: 12-17--22-46
+Trained 1410000 samples: 12-17--22-48
+Trained 1415000 samples: 12-17--22-50
+Trained 1420000 samples: 12-17--22-52
+Trained 1425000 samples: 12-17--22-54
+Trained 1430000 samples: 12-17--22-56
+Trained 1435000 samples: 12-17--22-59
+Trained 1440000 samples: 12-17--23-01
+Trained 1445000 samples: 12-17--23-03
+Trained 1450000 samples: 12-17--23-05
+saving model to: ../test_more_layers/test_more_layers_12-17--23-05
+Trained 1455000 samples: 12-17--23-07
+Trained 1460000 samples: 12-17--23-09
+Trained 1465000 samples: 12-17--23-11
+Trained 1470000 samples: 12-17--23-13
+Trained 1475000 samples: 12-17--23-15
+Trained 1480000 samples: 12-17--23-17
+Trained 1485000 samples: 12-17--23-19
+Trained 1490000 samples: 12-17--23-21
+Trained 1495000 samples: 12-17--23-23
+Trained 1500000 samples: 12-17--23-25
+saving model to: ../test_more_layers/test_more_layers_12-17--23-25
+Trained 1505000 samples: 12-17--23-27
+Trained 1510000 samples: 12-17--23-29
+Trained 1515000 samples: 12-17--23-31
+Trained 1520000 samples: 12-17--23-33
+Trained 1525000 samples: 12-17--23-35
+Trained 1530000 samples: 12-17--23-37
+Trained 1535000 samples: 12-17--23-39
+Trained 1540000 samples: 12-17--23-41
+Trained 1545000 samples: 12-17--23-43
+Trained 1550000 samples: 12-17--23-45
+saving model to: ../test_more_layers/test_more_layers_12-17--23-45
+Trained 1555000 samples: 12-17--23-47
+Trained 1560000 samples: 12-17--23-49
+Trained 1565000 samples: 12-17--23-51
+Trained 1570000 samples: 12-17--23-53
+Trained 1575000 samples: 12-17--23-55
+Trained 1580000 samples: 12-17--23-57
+Trained 1585000 samples: 12-17--23-59
+Trained 1590000 samples: 12-18--00-01
+Trained 1595000 samples: 12-18--00-03
+Trained 1600000 samples: 12-18--00-05
+saving model to: ../test_more_layers/test_more_layers_12-18--00-05
+Trained 1605000 samples: 12-18--00-07
+Trained 1610000 samples: 12-18--00-09
+Trained 1615000 samples: 12-18--00-11
+Trained 1620000 samples: 12-18--00-13
+Trained 1625000 samples: 12-18--00-15
+Traceback (most recent call last):
+  File "/home/n/AI-Generated-Music-Challenge/src/bach_model.py", line 303, in <module>
+    # train(PARSED_SONGS_PKL="../data/50songs.pkl", MODEL_SAVE_DIR="../test_more_layers/")
+  File "/home/n/AI-Generated-Music-Challenge/src/bach_model.py", line 195, in train
+    feed_dict={notes_in_placeholder: X, notes_out_placeholder: y})
+  File "/home/n/.local/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 905, in run
+    run_metadata_ptr)
+  File "/home/n/.local/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1140, in _run
+    feed_dict_tensor, options, run_metadata)
+  File "/home/n/.local/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1321, in _do_run
+    run_metadata)
+  File "/home/n/.local/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1327, in _do_call
+    return fn(*args)
+  File "/home/n/.local/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1312, in _run_fn
+    options, feed_dict, fetch_list, target_list, run_metadata)
+  File "/home/n/.local/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 1420, in _call_tf_sessionrun
+    status, run_metadata)
+KeyboardInterrupt
+
+Process finished with exit code 1
+
+
+
+    NUM_NOTES = 60
+    ONEHOT_LENGTH = 7
+    NUM_TIMESTEPS = 64
+    BATCH_SIZE = 5
+    LEARNING_RATE = 0.001
+    NETWORK_LAYERS = [100, 100, ONEHOT_LENGTH*NUM_NOTES]
+
+    NUM_SAMPLES_TO_TRAIN = 2*1000000
+    SAVE_EVERY = 50000
+
+
+trained for 1.6M samples, the extra layer didnt seem like it was helping. Moving on to a larger layer test.

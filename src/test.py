@@ -64,8 +64,17 @@ for df_index in range(2):
 #
 # s[0] = 1111
 # print(l)
+#
+# x = [0, 1, 2, 3, 4, 5, 6]
+#
+# print(len(x[1:-1]))
+# print(np.argmin(x[1:-1]))
 
-x = [0, 1, 2, 3, 4, 5, 6]
+time_index_length = 4
 
-print(len(x[1:-1]))
-print(np.argmin(x[1:-1]))
+if time_index_length != 0:
+    time_index_dict = {i: [(0 if j != i else 1) for j in range(time_index_length)] for i in range(time_index_length)}
+
+
+
+print(time_index_dict)

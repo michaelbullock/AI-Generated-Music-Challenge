@@ -1,9 +1,6 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
 from music21 import *
 import pickle
-
 import datetime
 
 # for finding all midi files in a given directory
@@ -197,35 +194,69 @@ class MusicParser:
         return
 
 
-def midis_to_parsed_songs(LOAD_DIR, SAVE_DIR, SAVE_NAME):
-    music_parser = MusicParser()
+# def midis_to_parsed_songs(LOAD_DIR, SAVE_DIR, SAVE_NAME):
+#     music_parser = MusicParser()
+#
+#     # LOAD_DIR = "../scales/"
+#     # SAVE_DIR = "../data/"
+#     # SAVE_NAME = "4scales_parsed"
+#     all_files = [f for f in listdir(LOAD_DIR) if isfile(join(LOAD_DIR, f))]
+#
+#     # comb out all files that are not .mid
+#     index = 0
+#     while index < len(all_files):
+#         if all_files[index][-4:] != ".mid":
+#             del all_files[index]
+#         else:
+#             index += 1
+#
+#     # create list of all parsed songs that will be saved as a pickle
+#     all_songs_time_series = []
+#
+#     # iterate over all midis in the directory
+#     for score_name in all_files:
+#         score = converter.parse(LOAD_DIR + score_name)
+#
+#         note_data = music_parser.score_to_note_data(score)
+#         time_series = music_parser.note_data_to_time_series(note_data, 40, 80)
+#
+#         all_songs_time_series.append(time_series)
+#
+#
+#     # saved parsed scores as a pickle
+#     with open(SAVE_DIR + SAVE_NAME + ".pkl", 'wb') as f:
+#         pickle.dump(all_songs_time_series, f, pickle.HIGHEST_PROTOCOL)
 
-    # LOAD_DIR = "../scales/"
-    # SAVE_DIR = "../data/"
-    # SAVE_NAME = "4scales_parsed"
-    all_files = [f for f in listdir(LOAD_DIR) if isfile(join(LOAD_DIR, f))]
+    @staticmethod
+    def midis_to_time_series_pickle(PATH_TO_MIDIS, SAVE_PATH_AND_NAME):
+        # manually chosen, pick better parameter better
+        min = 30
+        max = 90
 
-    # comb out all files that are not .mid
-    index = 0
-    while index < len(all_files):
-        if all_files[index][-4:] != ".mid":
-            del all_files[index]
-        else:
+        # create parser
+        parser = MusicParser()
+
+        # read names of all files in LOAD_DIR
+        all_files = [f for f in listdir(PATH_TO_MIDIS) if isfile(join(PATH_TO_MIDIS, f))]
+
+        # comb out all files that are not .mid
+        index = 0
+        while index < len(all_files):
+            if all_files[index][-4:] != ".mid":
+                del all_files[index]
             index += 1
 
-    # create list of all parsed songs that will be saved as a pickle
-    all_songs_time_series = []
+        all_songs_parsed = []
 
-    # iterate over all midis in the directory
-    for score_name in all_files:
-        score = converter.parse(LOAD_DIR + score_name)
+        # iterate through all files in directory
+        for filename in all_files:
+            print("parsing: " + filename)
+            score = converter.parse(r'' + PATH_TO_MIDIS + filename)
+            note_data = parser.score_to_note_data(score)
+            # min = self.get_smallest_note_value(note_data)
+            # max = self.get_largest_note_value(note_data)
+            time_series = parser.note_data_to_time_series(note_data, min, max - min)
+            all_songs_parsed.append(time_series)
 
-        note_data = music_parser.score_to_note_data(score)
-        time_series = music_parser.note_data_to_time_series(note_data, 40, 80)
-
-        all_songs_time_series.append(time_series)
-
-
-    # saved parsed scores as a pickle
-    with open(SAVE_DIR + SAVE_NAME + ".pkl", 'wb') as f:
-        pickle.dump(all_songs_time_series, f, pickle.HIGHEST_PROTOCOL)
+        with open(SAVE_PATH_AND_NAME + ".pkl", 'wb') as f:
+            pickle.dump(all_songs_parsed, f, pickle.HIGHEST_PROTOCOL)
